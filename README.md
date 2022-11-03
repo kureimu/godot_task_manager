@@ -32,4 +32,4 @@ taskManager有两个用户等级，分别为Manager(管理员)，Operator(操作
 
 Manager可以管理项目的内容，Operator可以对项目新增记录
 
-服务器端的窗口可以注册账号，管理项目，对项目导出CSV表格
+服务器端的窗口可以注册账号，添加项目，对项目导出CSV表格
