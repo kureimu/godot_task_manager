@@ -14,7 +14,7 @@ This is my first open source project, based on the Godot4 game engine (beta4).
 # Contents
 - Client program:
 ./taskManager
--Server program:
+- Server program:
 ./taskManager_ server
 # Operating environment
 Godot4beta4
