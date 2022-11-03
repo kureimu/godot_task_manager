@@ -2,7 +2,18 @@
 
 这是我的第一个开源项目，基于Godot4游戏引擎(beta4)
 注意！**这并不是一个完整的程序**，存在一些功能缺失，可以按照自己的需求修改
+
 # 演示图片
+
+- 服务器未连接状态主页
+![image](https://user-images.githubusercontent.com/22912744/199709608-b5622831-66d2-4003-aebb-894e7085bc06.png)
+- 管理员管理模块
+![image](https://user-images.githubusercontent.com/22912744/199709906-ee7b2745-2f16-45a2-864b-b8b1132d36e3.png)
+- 操作员添加记录
+![image](https://user-images.githubusercontent.com/22912744/199710086-846cc1f1-8eee-45b1-b31d-abeeec0754c1.png)
+- 操作员修改项目
+![image](https://user-images.githubusercontent.com/22912744/199710133-29051cb2-d8cd-4178-a19e-efbb2c58c52b.png)
+
 # 目录
 
 ## 客户端程序：
