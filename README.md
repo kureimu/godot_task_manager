@@ -16,10 +16,10 @@
 
 # 目录
 
-## 客户端程序：
+- 客户端程序：
 ./taskManager
 
-## 服务端程序：
+- 服务端程序：
 ./taskManager_server
 
 # 运行环境
