@@ -16,7 +16,7 @@
 - 客户端程序：
 ./taskManager
 - 服务器程序：
-./taskManager_服务器
+./taskManager_server
 # 操作环境
 Godot4beta4
 # 简介
