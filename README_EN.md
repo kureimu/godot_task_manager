@@ -12,7 +12,7 @@ This is my first open source project, based on the Godot4 game engine (beta4).
 - Operators modify items
 ![image]( https://user-images.githubusercontent.com/22912744/199710133-29051cb2-d8cd-4178-a19e-efbb2c58c52b.png )
 # Contents
--Client program:
+- Client program:
 ./taskManager
 -Server program:
 ./taskManager_ server
