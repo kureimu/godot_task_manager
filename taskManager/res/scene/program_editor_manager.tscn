@@ -1,0 +1,275 @@
+[gd_scene load_steps=6 format=3 uid="uid://enhfltxa8fkx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gvnap"]
+bg_color = Color(0.372549, 0.372549, 0.372549, 1)
+
+[sub_resource type="GDScript" id="GDScript_fru1d"]
+resource_name = "root"
+script/source = "extends PanelContainer
+
+@onready var program_name_lab = get_node(\"%program_name\")
+@onready var back_btn = get_node(\"%back\")
+@onready var list = get_node(\"%List\")
+
+## 组件添加器
+@onready var chooser = get_node(\"%chooser\")
+@onready var adder = get_node(\"%adder\")
+
+## 关键按钮
+@onready var delthis = get_node(\"%delthis\")
+@onready var apply = get_node(\"%apply\")
+
+var blockPool := {}
+
+var program_name : String
+
+func _ready():
+	# 设置blockPool（块对象池）
+	blockPool[0] = load(\"res://res/scene/block_editor_mode/splitBlock.tscn\")
+	blockPool[1] = load(\"res://res/scene/block_editor_mode/stringBlock.tscn\")
+	blockPool[2] = load(\"res://res/scene/block_editor_mode/checkBtnBlock.tscn\")
+	blockPool[3] = load(\"res://res/scene/block_editor_mode/checkBoxBlock.tscn\")
+	# 清除list
+	for item in list.get_children():
+		item.queue_free()
+	# 导入数据
+	program_name = get_meta(\"program_name\")
+	program_name_lab.text = \"项目管理器:\" + program_name
+	# 获得该program的data
+	programs.rpc_id(1,\"send_program_data\",program_name)
+	programs.connect(\"programs_data_recived\",Callable(self,\"programs_data_recived\"))
+	# 返回按钮
+	back_btn.connect(\"pressed\",Callable(self,\"_back_pressed\"))
+	# chooser与adder
+	adder.connect(\"pressed\",Callable(self,\"adder_pressed\"))
+	# 关键按钮
+	apply.connect(\"pressed\",Callable(self,\"apply_pressed\"))
+
+## 返回被点击
+func _back_pressed():
+	self.queue_free()
+	programs.flush_program_list()
+	pass
+
+## 添加组件按钮被点击
+func adder_pressed():
+	var choose :int = chooser.selected
+	var instan = blockPool[choose]
+	instan = instan.instantiate()
+	list.add_child(instan)
+
+## 提交按钮被点击
+func apply_pressed():
+	print(outputData())
+	programs.rpc_id(1,\"_s_save_programs\",program_name,outputData())
+	var tip = load(\"res://res/scene/tip.tscn\")
+	tip = tip.instantiate()
+	get_viewport().add_child(tip)
+	tip.get_child(0).text = \"项目模板成功设置！\"
+	pass
+
+
+## 导出数据
+func outputData() -> Array:
+	var output : Array
+	for item in list.get_children():
+		var dataDic = {}
+		var titlle = item.le.text
+		var itemType = item.get_meta(\"type\")
+		dataDic[\"type\"] = itemType
+		dataDic[\"title\"] = titlle
+		match itemType:
+			0:
+				#split_block
+				pass
+			1:
+				#string_block
+				pass
+			2:
+				#check_btn_block
+				var btn_name = item.le2.text
+				dataDic[\"btn_name\"] = btn_name
+			3:
+				#check_box_block
+				var btn_arr = item.getArr()
+				dataDic[\"btn_arr\"] = btn_arr
+		output.append(dataDic)
+		pass
+	return output
+
+## 收到该program的数据并设置该项目的数据
+func programs_data_recived(program_name:String,data:Array):
+	print(\"接收program数据:\",data)
+	# 通过Match组件名称来设置对应属性
+	for dic in data:
+		var node = blockPool[dic[\"type\"]].instantiate()
+		list.add_child(node)
+		match dic[\"type\"]:
+			0:
+				pass
+			1:
+				pass
+			2:
+				node.le2.text = dic[\"btn_name\"]
+				pass
+			3:
+				node.setArr(dic[\"btn_arr\"])
+				pass
+		node.set_meta(\"type\",dic[\"type\"])
+		node.le.text = dic[\"title\"]
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ktos3"]
+content_margin_left = 20.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 8
+border_width_right = 8
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ql6fr"]
+bg_color = Color(0, 0, 0, 0.0980392)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgrln"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="program_editor" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gvnap")
+script = SubResource("GDScript_fru1d")
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+offset_right = 1280.0
+offset_bottom = 31.0
+
+[node name="back" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_right = 116.0
+offset_bottom = 31.0
+text = "< 返回项目列表"
+
+[node name="program_name" type="Label" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 120.0
+offset_top = 2.0
+offset_right = 1280.0
+offset_bottom = 28.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_ktos3")
+text = "记录编辑器"
+
+[node name="margin" type="MarginContainer" parent="VBoxContainer"]
+offset_top = 35.0
+offset_right = 1280.0
+offset_bottom = 685.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+metadata/_edit_lock_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1260.0
+offset_bottom = 630.0
+theme_override_constants/separation = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+offset_right = 1240.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer"]
+offset_right = 1240.0
+offset_bottom = 610.0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ql6fr")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer"]
+offset_right = 1240.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_right = 10
+
+[node name="allList" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer"]
+offset_right = 1230.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TiltleBar" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList"]
+offset_right = 1230.0
+offset_bottom = 26.0
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList/TiltleBar"]
+offset_right = 1230.0
+offset_bottom = 26.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_kgrln")
+text = "记录详情▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList"]
+unique_name_in_owner = true
+offset_top = 46.0
+offset_right = 1230.0
+offset_bottom = 46.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList"]
+offset_top = 66.0
+offset_right = 1230.0
+offset_bottom = 97.0
+alignment = 1
+
+[node name="chooser" type="OptionButton" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 491.0
+offset_right = 663.0
+offset_bottom = 31.0
+item_count = 4
+selected = 0
+popup/item_0/text = "split_block"
+popup/item_0/id = 0
+popup/item_1/text = "string_block"
+popup/item_1/id = 1
+popup/item_2/text = "check_btn_block"
+popup/item_2/id = 2
+popup/item_3/text = "check_box_block"
+popup/item_3/id = 3
+
+[node name="adder" type="Button" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 667.0
+offset_right = 738.0
+offset_bottom = 31.0
+text = "添加组件"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+offset_top = 689.0
+offset_right = 1280.0
+offset_bottom = 720.0
+alignment = 2
+
+[node name="apply" type="Button" parent="VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+offset_left = 1209.0
+offset_right = 1280.0
+offset_bottom = 31.0
+text = "提交更改"

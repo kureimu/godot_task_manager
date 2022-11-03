@@ -1,0 +1,116 @@
+[gd_scene load_steps=5 format=3 uid="uid://cl3sfhwnmh0u"]
+
+[sub_resource type="GDScript" id="GDScript_wd5tl"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+@onready var le = get_node(\"%LineEdit\")
+@onready var le2 = get_node(\"%LineEdit2\")
+@onready var del = get_node(\"%del\")
+
+func _ready():
+	del.connect(\"pressed\",Callable(self,\"del_pressed\"))
+
+func del_pressed():
+	self.queue_free()
+	pass
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.262745, 0.913725, 0.482353, 1, 0.219608, 0.976471, 0.843137, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jwsqt"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.580392, 0.580392, 0.580392, 1)
+
+[node name="cheakBtnBlock" type="MarginContainer"]
+custom_minimum_size = Vector2i(0, 175)
+offset_right = 741.0
+offset_bottom = 175.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_wd5tl")
+metadata/_edit_lock_ = true
+metadata/type = 2
+
+[node name="stringBlock" type="PanelContainer" parent="."]
+layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 234.0
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="stringBlock"]
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 224.0
+
+[node name="Label" type="Label" parent="stringBlock/VBoxContainer"]
+custom_minimum_size = Vector2i(0, 30)
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 30.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_jwsqt")
+text = "开关模块(check button block)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="stringBlock/VBoxContainer"]
+layout_mode = 2
+offset_top = 34.0
+offset_right = 641.0
+offset_bottom = 224.0
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="stringBlock/VBoxContainer/MarginContainer"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 631.0
+offset_bottom = 180.0
+
+[node name="LineEdit" type="TextEdit" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 100)
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 100.0
+placeholder_text = "填写标题文字"
+
+[node name="LineEdit2" type="LineEdit" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 104.0
+offset_right = 621.0
+offset_bottom = 135.0
+placeholder_text = "开关名"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 139.0
+offset_right = 621.0
+offset_bottom = 170.0
+alignment = 2
+
+[node name="del" type="Button" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 581.0
+offset_right = 621.0
+offset_bottom = 31.0
+text = "删除"

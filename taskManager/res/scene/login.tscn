@@ -1,0 +1,124 @@
+[gd_scene load_steps=2 format=3 uid="uid://b1vypck7od3l2"]
+
+[sub_resource type="GDScript" id="GDScript_xnydn"]
+resource_name = "root"
+script/source = "extends Control
+
+@onready var user = get_node(\"%user\")
+@onready var pwd = get_node(\"%pwd\")
+@onready var login = get_node(\"%login\")
+
+func _ready():
+	login.connect(\"pressed\",Callable(self,\"btn_pressed\"))
+	pass
+
+func btn_pressed():
+	account.rpc_id(1,\"login\",user.get_text(),pwd.get_text())
+"
+
+[node name="login" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_xnydn")
+metadata/_edit_lock_ = true
+
+[node name="background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.117647)
+metadata/_edit_lock_ = true
+
+[node name="panelcontainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(330, 205)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -165.0
+offset_top = -102.5
+offset_right = 165.0
+offset_bottom = 102.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="panelcontainer"]
+offset_right = 330.0
+offset_bottom = 205.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelcontainer/HBoxContainer"]
+offset_left = 14.0
+offset_right = 316.0
+offset_bottom = 205.0
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="panelcontainer/HBoxContainer/VBoxContainer"]
+offset_top = 24.0
+offset_right = 302.0
+offset_bottom = 55.0
+
+[node name="Label" type="Label" parent="panelcontainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+offset_top = 2.0
+offset_right = 48.0
+offset_bottom = 28.0
+text = "账号："
+
+[node name="user" type="LineEdit" parent="panelcontainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+offset_left = 52.0
+offset_right = 302.0
+offset_bottom = 31.0
+placeholder_text = "输入账号"
+max_length = 20
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="panelcontainer/HBoxContainer/VBoxContainer"]
+offset_top = 87.0
+offset_right = 302.0
+offset_bottom = 118.0
+
+[node name="Label" type="Label" parent="panelcontainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+offset_top = 2.0
+offset_right = 48.0
+offset_bottom = 28.0
+text = "密码："
+
+[node name="pwd" type="LineEdit" parent="panelcontainer/HBoxContainer/VBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+offset_left = 52.0
+offset_right = 302.0
+offset_bottom = 31.0
+placeholder_text = "输入密码"
+max_length = 20
+secret = true
+caret_blink = true
+caret_blink_interval = 0.5
+
+[node name="MarginContainer" type="MarginContainer" parent="panelcontainer/HBoxContainer/VBoxContainer"]
+offset_top = 150.0
+offset_right = 302.0
+offset_bottom = 181.0
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_right = 15
+
+[node name="login" type="Button" parent="panelcontainer/HBoxContainer/VBoxContainer/MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+offset_left = 15.0
+offset_right = 287.0
+offset_bottom = 31.0
+text = "登录"

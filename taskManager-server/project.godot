@@ -1,0 +1,26 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="taskManager-server"
+run/main_scene="res://Main.tscn"
+config/features=PackedStringArray("4.0", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+network="*res://network.gd"
+account="*res://class/account.gd"
+programs="*res://class/programs.gd"
+
+[gui]
+
+theme/custom_font="res://font/hui_pu/AlibabaPuHuiTi-2-55-Regular.otf"

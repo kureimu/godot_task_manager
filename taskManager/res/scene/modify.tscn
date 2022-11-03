@@ -1,0 +1,300 @@
+[gd_scene load_steps=6 format=3 uid="uid://cgmevfwqd73on"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hpgil"]
+bg_color = Color(0.223529, 0.223529, 0.223529, 1)
+
+[sub_resource type="GDScript" id="GDScript_8wek2"]
+resource_name = "root"
+script/source = "extends PanelContainer
+
+@onready var back = get_node(\"%back\")
+@onready var program_name_lab = get_node(\"%program_name\")
+@onready var contentList = get_node(\"%contentList\")
+
+# 关键按钮
+@onready var del = get_node(\"%del\")
+@onready var apply = get_node(\"%apply\")
+
+var program_name : String
+var account_name : String
+var sign_name : String
+
+var blockPool := {}
+
+signal block_already
+
+#####################################################################
+
+func _ready():
+	# 设置blockPool（块对象池）
+	blockPool[0] = load(\"res://res/scene/block/splitBlock.tscn\")
+	blockPool[1] = load(\"res://res/scene/block/stringBlock.tscn\")
+	blockPool[2] = load(\"res://res/scene/block/checkBtnBlock.tscn\")
+	blockPool[3] = load(\"res://res/scene/block/checkBoxBlock.tscn\")
+	# 获取meta并设置标题
+	var programName = get_meta(\"program_name\")
+	var accountName = get_meta(\"account_name\")
+	var title = get_meta(\"title\")
+	program_name_lab.text = \"修改项目：\" + str(title)
+	program_name = programName
+	account_name = accountName
+	sign_name = title
+	# 设置返回按钮
+	back.connect(
+		\"pressed\",
+		Callable(self,\"_back_pressed\")
+	)
+	# 设置删除按钮
+	del.connect(
+		\"pressed\",
+		Callable(self,\"_del_preesed\")
+	)
+	################ 连接信号 #####################
+	# 等待设置完所有的模块 然后获取每个模块对应的数据
+	connect(\"block_already\",Callable(self,\"send_program_meta_data\"))
+	# 获得该program的模板
+	programs.rpc_id(1,\"send_program_data\",program_name)
+	programs.connect(\"programs_data_recived\",Callable(self,\"_programs_data_recived\"))
+	# meta_data
+	programs.connect(\"program_meta_data\",Callable(
+		self,
+		\"_meta_data_recived\"
+	))
+	# 关键按钮
+	apply.connect(\"pressed\",Callable(self,\"_apply_pressed\"))
+	
+
+func _back_pressed():
+	self.queue_free()
+	pass
+
+func _apply_pressed():
+	# 提交修改信息
+	programs.rpc_id(1,\"modify_program_meta_data\",program_name,account_name,sign_name,outputData())
+	# 添加提示
+	var tip = load(\"res://res/scene/tip.tscn\")
+	tip = tip.instantiate()
+	get_viewport().add_child(tip)
+	tip.get_child(0).text = \"信息更改完成\"
+	self.queue_free()
+
+func _meta_data_recived(programName:String,meta_data:Array):
+	print(\"meta_data:\",meta_data)
+	if programName == program_name:
+		for item in meta_data:
+			var item_data = item[2]
+			# block_data is Array
+			var num = -1
+			for block_data in item_data:
+				num = num + 1
+				match block_data[\"type\"]:
+					0:
+						# split_block
+						pass
+					1:
+						# string_block
+						# 从顺序设置属性
+						contentList.get_child(num).content.text = block_data[\"content\"]
+						pass
+					2:
+						# check_btn_block
+						contentList.get_child(num).checkButton.button_pressed = block_data[\"result\"]
+						pass
+					3:
+						# check_box_block
+						contentList.get_child(num).setResult(block_data[\"result\"])
+
+# 设置模板数据
+func _programs_data_recived(program_name:String,data:Array):
+	# 通过Match组件名称来设置对应属性
+	for dic in data:
+		var node = blockPool[dic[\"type\"]].instantiate()
+		contentList.add_child(node)
+		match dic[\"type\"]:
+			0:
+				node.titleBar.text = dic[\"title\"]
+			1:
+				node.rtl.text = dic[\"title\"]
+			2:
+				node.rtl.text = dic[\"title\"]
+				node.checkButton.text = dic[\"btn_name\"]
+				pass
+			3:
+				node.rtl.text = dic[\"title\"]
+				node.setArr(dic[\"btn_arr\"])
+				pass
+		node.set_meta(\"type\",dic[\"type\"])
+	emit_signal(\"block_already\")
+
+func _del_preesed():
+	programs.rpc_id(1,\"del_program_meta_data\",program_name,account_name,sign_name)
+	var tip = load(\"res://res/scene/tip.tscn\")
+	tip = tip.instantiate()
+	get_viewport().add_child(tip)
+	tip.get_child(0).text = \"已删除！\"
+	self.queue_free()
+	pass
+
+#####################################################################
+
+func outputData() -> Array:
+	var output : Array
+	for item in contentList.get_children():
+		var data = {}
+		var itemType = item.get_meta(\"type\")
+		data[\"type\"] = itemType
+		match itemType:
+			0:
+				#split_block
+				pass
+			1:
+				#string_block
+				data[\"content\"]=item.content.text
+				pass
+			2:
+				#check_btn_block
+				data[\"result\"] = item.checkButton.button_pressed
+				pass
+			3:
+				#check_box_block
+				data[\"result\"] = item.get_result()
+				pass
+		output.append(data)
+	return output
+
+func send_program_meta_data():
+	programs.rpc_id(1,\"send_program_meta_data\",program_name,account_name)
+	pass
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kam2a"]
+content_margin_left = 20.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 8
+border_width_right = 8
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dwte2"]
+bg_color = Color(0, 0, 0, 0.0980392)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xxjsx"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="modify" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hpgil")
+script = SubResource("GDScript_8wek2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+offset_right = 1280.0
+offset_bottom = 31.0
+
+[node name="back" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_right = 116.0
+offset_bottom = 31.0
+text = "< 返回添加记录"
+
+[node name="program_name" type="Label" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 120.0
+offset_top = 2.0
+offset_right = 1280.0
+offset_bottom = 28.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_kam2a")
+text = "记录编辑器"
+
+[node name="margin" type="MarginContainer" parent="VBoxContainer"]
+offset_top = 35.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+metadata/_edit_lock_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1260.0
+offset_bottom = 665.0
+theme_override_constants/separation = 20
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer"]
+custom_minimum_size = Vector2(500, 0)
+offset_right = 1240.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer"]
+offset_right = 1240.0
+offset_bottom = 610.0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_dwte2")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer"]
+offset_right = 1240.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_right = 10
+
+[node name="allList" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer"]
+offset_right = 1230.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TiltleBar" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList"]
+offset_right = 1230.0
+offset_bottom = 26.0
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList/TiltleBar"]
+offset_right = 1230.0
+offset_bottom = 26.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_xxjsx")
+text = "修改记录▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="contentList" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/ScrollContainer/MarginContainer/allList"]
+unique_name_in_owner = true
+offset_top = 46.0
+offset_right = 1230.0
+offset_bottom = 46.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer"]
+offset_top = 614.0
+offset_right = 1240.0
+offset_bottom = 645.0
+alignment = 2
+
+[node name="del" type="Button" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 1062.0
+offset_right = 1149.0
+offset_bottom = 31.0
+text = "删除此纪录"
+
+[node name="apply" type="Button" parent="VBoxContainer/margin/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 1153.0
+offset_right = 1240.0
+offset_bottom = 31.0
+text = "保存并提交"

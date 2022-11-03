@@ -1,0 +1,172 @@
+[gd_scene load_steps=5 format=3 uid="uid://0hy713njcdqv"]
+
+[sub_resource type="GDScript" id="GDScript_31ida"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+
+var cheakBox = preload(\"res://res/scene/block/component/check_box.tscn\")
+
+@onready var rtl = get_node(\"%RichTextLabel\")
+@onready var titleBar = get_node(\"%titleBar\")
+@onready var list = get_node(\"%List\")
+var listState := {}
+
+func _ready():
+	clear_all_item()
+	add_item(0,\"商品巡检\")
+	add_item(1,\"订单巡检\")
+	add_item(2,\"车辆购置巡检\")
+
+func clear_all_item():
+	# 清空
+	for i in list.get_children():
+		i.queue_free()
+	pass
+
+func add_item(id : int,text:String):
+	var new_cheakBox = cheakBox.instantiate()
+	new_cheakBox.text = text
+	new_cheakBox.set_meta(\"id\",id)
+	listState[id] = false
+	list.add_child(new_cheakBox)
+	new_cheakBox.connect(\"toggled\",Callable(self,\"item_toggled\").bind(new_cheakBox.get_meta(\"id\")))
+	pass
+
+func item_toggled(button_pressed:bool,id : int):
+	listState[id] = button_pressed
+#	print(\"-------------------------\")
+#	print(button_pressed,id)
+#	print(listState)
+
+func getArr() -> Array:
+	var output : Array
+	for item in list.get_children():
+		output.append(item.get_child(0).text)
+	return output
+
+func setArr(input : Array):
+	var btn_group = ButtonGroup.new()
+	for i in list.get_children():
+		i.queue_free()
+	for item in input:
+		var checkBox : CheckBox = CheckBox.new()
+		list.add_child(checkBox)
+		checkBox.text = item
+		checkBox.button_group = btn_group
+		pass
+	if list.get_child(0):
+		list.get_child(0).set_pressed(true)
+	pass
+
+func setResult(result:int):
+	var num = -1
+	for node in list.get_children():
+		num += 1
+		if num == result:
+			list.get_child(num).button_pressed = true
+		pass
+	pass
+
+## 没有选择就返回-1
+func get_result() -> int:
+	for item in list.get_children():
+		if item.button_pressed == true:
+			return item.get_index()
+	return -1
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.415686, 0.0666667, 0.796078, 1, 0.145098, 0.458824, 0.988235, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ol5al"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.803922, 0.803922, 0.803922, 1)
+
+[node name="cheakBoxBlock" type="MarginContainer"]
+offset_right = 741.0
+offset_bottom = 407.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_31ida")
+metadata/_edit_lock_ = true
+metadata/type = 3
+
+[node name="panelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(0, 250)
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 397.0
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer"]
+offset_right = 641.0
+offset_bottom = 387.0
+
+[node name="titleBar" type="Label" parent="panelContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 30)
+offset_right = 641.0
+offset_bottom = 30.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_ol5al")
+text = "单选模块(check box block)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="panelContainer/VBoxContainer"]
+offset_top = 34.0
+offset_right = 641.0
+offset_bottom = 387.0
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 631.0
+offset_bottom = 343.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+offset_right = 621.0
+offset_bottom = 164.0
+size_flags_vertical = 3
+text = "待替换标题"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+offset_top = 168.0
+offset_right = 621.0
+offset_bottom = 333.0
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer"]
+offset_right = 621.0
+offset_bottom = 165.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="List" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer"]
+unique_name_in_owner = true
+offset_left = 12.0
+offset_right = 609.0
+offset_bottom = 165.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12

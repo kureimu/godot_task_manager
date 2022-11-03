@@ -1,0 +1,408 @@
+[gd_scene load_steps=8 format=3 uid="uid://431m0olocheq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gvnap"]
+bg_color = Color(0.329412, 0.329412, 0.329412, 1)
+
+[sub_resource type="GDScript" id="GDScript_5qbhr"]
+resource_name = "root"
+script/source = "extends PanelContainer
+
+@onready var program_name_lab = get_node(\"%program_name\")
+@onready var back_btn = get_node(\"%back\")
+@onready var list = get_node(\"%List\")
+@onready var contentList = get_node(\"%contentList\")
+
+@onready var main = get_parent()
+
+# 关键按钮
+@onready var apply = get_node(\"%apply\")
+# 过滤按钮
+@onready var time_option : OptionButton = get_node(\"%time_option\")
+
+var blockPool := {}
+# 存储收到的记录列表
+var program_signed_recived
+
+var program_name
+
+var signd_day_list : Array
+
+func _ready():
+	# 设置blockPool（块对象池）
+	blockPool[0] = load(\"res://res/scene/block/splitBlock.tscn\")
+	blockPool[1] = load(\"res://res/scene/block/stringBlock.tscn\")
+	blockPool[2] = load(\"res://res/scene/block/checkBtnBlock.tscn\")
+	blockPool[3] = load(\"res://res/scene/block/checkBoxBlock.tscn\")
+	# 导入数据
+	program_name = get_meta(\"program_name\")
+	program_name_lab.text = \"项目:\"+program_name
+	# 获得该program的模板
+	programs.rpc_id(1,\"send_program_data\",program_name)
+	programs.connect(\"programs_data_recived\",Callable(self,\"programs_data_recived\"))
+	# 返回按钮
+	back_btn.connect(\"pressed\",Callable(self,\"_back_pressed\"))
+	# 关键按钮
+	apply.connect(\"pressed\",Callable(self,\"_apply_pressed\"))
+	time_option.connect(\"item_selected\",Callable(self,\"_time_selected\"))
+	# 刷新记录列表
+	var err = programs.connect(\"signed_list\",Callable(self,\"signed_list\"))
+	if err != OK:
+		printerr(\"记录列表获取失败！！！ ，code:\",err)
+	signed()
+
+func _back_pressed():
+	self.queue_free()
+	programs.flush_program_list()
+	pass
+
+func _time_option_flush():
+	time_option.clear()
+	time_option.add_item(\"请选择过滤日期\")
+	signd_day_list = []
+	var num = 0
+	var wait_arr : Array
+	if program_signed_recived == null:
+		printerr(\"读取记录列表失败\")
+	for i in program_signed_recived:
+		num += 1
+		var time_day : String = str(i).split(\"T\")[0]
+		var is_chongfu := false
+		# 检查是否重复
+		for wait in wait_arr:
+			if wait == time_day:
+				is_chongfu = true
+				pass
+			pass
+		if !is_chongfu:
+			wait_arr.append(time_day)
+			pass
+		pass
+	for item in wait_arr:
+		num += 1
+		time_option.add_item(item,num)
+	signd_day_list = wait_arr
+
+func _time_selected(index : int):
+	if program_signed_recived == null:
+		printerr(\"读取记录列表失败\")
+	if index == 0:
+		set_node_list(program_signed_recived)
+		pass
+	else:
+		var new_sign_list := []
+		for block in program_signed_recived:
+			var time_day : String = str(block).split(\"T\")[0]
+			if time_day == signd_day_list[index - 1]:
+				new_sign_list.append(block)
+		set_node_list(new_sign_list)
+	pass
+
+func set_node_list(data : Array):
+	for i in list.get_children():
+		i.queue_free()
+	for i in data:
+		var btn = Button.new()
+		btn.text = str(i)
+		list.add_child(btn)
+		btn.connect(\"pressed\",Callable(self,\"program_list_btn_pressed\").bind(str(i)))
+	pass
+
+func _apply_pressed():
+	var outputData := outputData()
+	var err := false
+	for block in outputData:
+		match block[\"type\"]:
+			0:
+				pass
+			1:
+				var string :String = block[\"content\"]
+				if string.is_empty():err = true
+			2:
+				pass
+			3:
+				if block[\"result\"] == -1:err = true
+	if !err:
+		programs.rpc_id(1,\"_s_save_meta_data\",program_name,account.bindAccount,outputData())
+		signed()
+	else:
+		var tip = load(\"res://res/scene/tip.tscn\")
+		tip = tip.instantiate()
+		get_viewport().add_child(tip)
+		tip.get_child(0).text = \"请检查提交的内容里是否填写完整\"
+		pass
+
+## 收到该program的数据并设置该项目的模板
+func programs_data_recived(program_name:String,data:Array):
+	# 清空content列表
+	for node in contentList.get_children():
+		node.queue_free()
+	# 通过Match组件名称来设置对应属性
+	for dic in data:
+		var node = blockPool[dic[\"type\"]].instantiate()
+		contentList.add_child(node)
+		match dic[\"type\"]:
+			0:
+				node.titleBar.text = dic[\"title\"]
+			1:
+				node.rtl.text = dic[\"title\"]
+			2:
+				node.rtl.text = dic[\"title\"]
+				node.checkButton.text = dic[\"btn_name\"]
+				pass
+			3:
+				node.rtl.text = dic[\"title\"]
+				node.setArr(dic[\"btn_arr\"])
+				pass
+		node.set_meta(\"type\",dic[\"type\"])
+
+func outputData() -> Array:
+	var output : Array
+	for item in contentList.get_children():
+		var data = {}
+		var itemType = item.get_meta(\"type\")
+		data[\"type\"] = itemType
+		match itemType:
+			0:
+				#split_block
+				pass
+			1:
+				#string_block
+				data[\"content\"]=item.content.text
+				pass
+			2:
+				#check_btn_block
+				data[\"result\"] = item.checkButton.button_pressed
+				pass
+			3:
+				#check_box_block
+				data[\"result\"] = item.get_result()
+				
+				pass
+		output.append(data)
+	return output
+
+
+## 刷新记录列表
+func signed():
+	programs.rpc_id(1,\"send_signed_list\",program_name,account.bindAccount)
+## 接收记录列表
+func signed_list(_program_name:String,data:Array):
+	program_signed_recived = data
+	for i in list.get_children():
+		i.queue_free()
+	if _program_name == program_name:
+		for i in data:
+			var btn = Button.new()
+			btn.text = str(i)
+			list.add_child(btn)
+			btn.connect(\"pressed\",Callable(self,\"program_list_btn_pressed\").bind(str(i)))
+	_time_option_flush()
+
+func program_list_btn_pressed(title:String):
+	var modify_gui = preload(\"res://res/scene/modify.tscn\")
+	modify_gui = modify_gui.instantiate()
+	modify_gui.set_meta(\"program_name\",program_name)
+	modify_gui.set_meta(\"account_name\",account.bindAccount)
+	modify_gui.set_meta(\"title\",title)
+	main.add_child(modify_gui)
+	modify_gui.connect(\"tree_exiting\",Callable(self,\"_modify_exiting\"))
+	pass
+
+func _modify_exiting():
+	signed()
+	pass
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gvks2"]
+content_margin_left = 20.0
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 8
+border_width_right = 8
+border_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5rcdm"]
+bg_color = Color(0, 0, 0, 0.0980392)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7rp6t"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ql6fr"]
+bg_color = Color(0, 0, 0, 0.0980392)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kgrln"]
+bg_color = Color(0, 0, 0, 1)
+
+[node name="program_editor" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gvnap")
+script = SubResource("GDScript_5qbhr")
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 1280.0
+offset_bottom = 720.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+offset_right = 1280.0
+offset_bottom = 31.0
+
+[node name="back" type="Button" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_right = 116.0
+offset_bottom = 31.0
+text = "< 返回项目列表"
+
+[node name="program_name" type="Label" parent="VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 120.0
+offset_top = 2.0
+offset_right = 1280.0
+offset_bottom = 28.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_gvks2")
+text = "记录编辑器"
+
+[node name="margin" type="MarginContainer" parent="VBoxContainer"]
+offset_top = 35.0
+offset_right = 1280.0
+offset_bottom = 720.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+metadata/_edit_lock_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin"]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 1260.0
+offset_bottom = 665.0
+theme_override_constants/separation = 20
+
+[node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer/margin/HBoxContainer"]
+offset_right = 1240.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+split_offset = -200
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(400, 0)
+offset_right = 414.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer"]
+offset_right = 414.0
+offset_bottom = 610.0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_5rcdm")
+
+[node name="itemButton" type="MarginContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer/ScrollContainer"]
+offset_right = 414.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer/ScrollContainer/itemButton"]
+custom_minimum_size = Vector2(300, 0)
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 409.0
+offset_bottom = 605.0
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer/ScrollContainer/itemButton/VBoxContainer"]
+offset_right = 404.0
+offset_bottom = 26.0
+theme_override_styles/normal = SubResource("StyleBoxFlat_7rp6t")
+text = "已提交记录列表▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="List" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer/ScrollContainer/itemButton/VBoxContainer"]
+unique_name_in_owner = true
+offset_top = 36.0
+offset_right = 404.0
+offset_bottom = 600.0
+size_flags_vertical = 3
+
+[node name="time_option" type="OptionButton" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer"]
+unique_name_in_owner = true
+offset_top = 614.0
+offset_right = 414.0
+offset_bottom = 645.0
+item_count = 1
+popup/item_0/text = "选择过滤时间"
+popup/item_0/id = 0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer"]
+custom_minimum_size = Vector2(500, 0)
+offset_left = 426.0
+offset_right = 1240.0
+offset_bottom = 645.0
+size_flags_horizontal = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2"]
+offset_right = 814.0
+offset_bottom = 610.0
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_ql6fr")
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/ScrollContainer"]
+offset_right = 814.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_right = 10
+
+[node name="allList" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/ScrollContainer/MarginContainer"]
+offset_right = 804.0
+offset_bottom = 610.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TiltleBar" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/ScrollContainer/MarginContainer/allList"]
+offset_right = 804.0
+offset_bottom = 26.0
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/ScrollContainer/MarginContainer/allList/TiltleBar"]
+offset_right = 804.0
+offset_bottom = 26.0
+size_flags_horizontal = 3
+theme_override_styles/normal = SubResource("StyleBoxFlat_kgrln")
+text = "添加新记录▼"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="contentList" type="VBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/ScrollContainer/MarginContainer/allList"]
+unique_name_in_owner = true
+offset_top = 46.0
+offset_right = 804.0
+offset_bottom = 46.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2"]
+offset_top = 614.0
+offset_right = 814.0
+offset_bottom = 645.0
+alignment = 2
+
+[node name="apply" type="Button" parent="VBoxContainer/margin/HBoxContainer/HSplitContainer/VBoxContainer2/HBoxContainer"]
+unique_name_in_owner = true
+offset_left = 774.0
+offset_right = 814.0
+offset_bottom = 31.0
+text = "添加"

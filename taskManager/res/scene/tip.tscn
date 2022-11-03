@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=3 uid="uid://bos0o8v7t53kn"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_txv26"]
+bg_color = Color(0, 0, 0, 0.160784)
+
+[sub_resource type="GDScript" id="GDScript_kpe3c"]
+resource_name = "root"
+script/source = "extends PanelContainer
+
+
+func _ready():
+	self.position = get_viewport_rect().size/2
+	self.position.x = 0
+	await get_tree().create_timer(3).timeout
+	var t = get_tree().create_tween().set_parallel()
+	t.tween_property(self,\"modulate\",Color(1,1,1,0),1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	t.tween_property(self,\"position\",Vector2(position.x,position.y - 100),1).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+"
+
+[node name="tip" type="PanelContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 50.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_txv26")
+script = SubResource("GDScript_kpe3c")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+offset_top = 12.0
+offset_right = 1280.0
+offset_bottom = 38.0
+text = "待替换文字"
+horizontal_alignment = 1
+vertical_alignment = 1

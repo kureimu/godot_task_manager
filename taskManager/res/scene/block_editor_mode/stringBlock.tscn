@@ -1,0 +1,115 @@
+[gd_scene load_steps=5 format=3 uid="uid://4f4pwohnglka"]
+
+[sub_resource type="GDScript" id="GDScript_n3ps3"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+@onready var le = get_node(\"%TextEdit\")
+@onready var del = get_node(\"%del\")
+
+func _ready():
+	del.connect(\"pressed\",Callable(self,\"del_pressed\"))
+
+func del_pressed():
+	self.queue_free()
+	pass
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.996078, 0.678431, 0.65098, 1, 0.960784, 0.937255, 0.937255, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_traev"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.607843, 0.607843, 0.607843, 1)
+
+[node name="stringBlock" type="MarginContainer"]
+offset_right = 741.0
+offset_bottom = 270.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_n3ps3")
+metadata/_edit_lock_ = true
+metadata/type = 1
+
+[node name="panelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2i(0, 250)
+layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 260.0
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer"]
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 250.0
+
+[node name="Label" type="Label" parent="panelContainer/VBoxContainer"]
+custom_minimum_size = Vector2i(0, 30)
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 30.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_traev")
+text = "文字录入模块(string block)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="panelContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 34.0
+offset_right = 641.0
+offset_bottom = 250.0
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 631.0
+offset_bottom = 206.0
+
+[node name="VSplitContainer" type="VSplitContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 161.0
+size_flags_vertical = 3
+
+[node name="TextEdit" type="TextEdit" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/VSplitContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 50)
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 161.0
+size_flags_vertical = 3
+placeholder_text = "在此输入"
+caret_blink = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 165.0
+offset_right = 621.0
+offset_bottom = 196.0
+alignment = 2
+
+[node name="del" type="Button" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 581.0
+offset_right = 621.0
+offset_bottom = 31.0
+text = "删除"

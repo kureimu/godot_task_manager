@@ -1,0 +1,47 @@
+[gd_scene load_steps=5 format=3 uid="uid://cu6330ragtecl"]
+
+[sub_resource type="GDScript" id="GDScript_rpxrx"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+@onready var titleBar = get_node(\"%Label\")
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.968627, 0.305882, 1, 1, 1, 0.176471, 0.490196, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_traev"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.607843, 0.607843, 0.607843, 1)
+
+[node name="splitBlock" type="MarginContainer"]
+offset_right = 741.0
+offset_bottom = 50.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_rpxrx")
+metadata/_edit_lock_ = true
+metadata/type = 0
+
+[node name="Label" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 30)
+layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 40.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_traev")
+text = "分隔模块(split block)"
+horizontal_alignment = 1
+vertical_alignment = 1

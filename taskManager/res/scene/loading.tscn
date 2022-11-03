@@ -1,0 +1,72 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxaxm6qd3b5tt"]
+
+[ext_resource type="Texture2D" uid="uid://c7fnyghv1hjxp" path="res://res/img/icon/loading.png" id="1_b5v1a"]
+
+[sub_resource type="GDScript" id="GDScript_6h7wq"]
+resource_name = "auto"
+script/source = "extends CanvasLayer
+
+"
+
+[sub_resource type="GDScript" id="GDScript_w4l64"]
+script/source = "extends Sprite2D
+
+
+func _ready():
+	var t = get_tree().create_tween().set_loops()
+	t.tween_property(self,\"rotation\",360.0,50).from(0.0)
+	pass
+"
+
+[node name="loading" type="CanvasLayer"]
+layer = 128
+script = SubResource("GDScript_6h7wq")
+
+[node name="loading" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="background" type="ColorRect" parent="loading"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.313726)
+metadata/_edit_lock_ = true
+
+[node name="PanelContainer" type="PanelContainer" parent="loading"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -144.0
+offset_right = 120.0
+offset_bottom = 144.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="Loading" type="Sprite2D" parent="loading/PanelContainer"]
+position = Vector2(116, 142)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("1_b5v1a")
+script = SubResource("GDScript_w4l64")
+
+[node name="Label" type="Label" parent="loading/PanelContainer"]
+layout_mode = 2
+offset_top = 131.0
+offset_right = 240.0
+offset_bottom = 157.0
+text = "连接中......"
+horizontal_alignment = 1
+vertical_alignment = 1

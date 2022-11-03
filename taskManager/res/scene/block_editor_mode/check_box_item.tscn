@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3 uid="uid://cqykwkk4201y"]
+
+[sub_resource type="GDScript" id="GDScript_6qy4y"]
+resource_name = "root"
+script/source = "extends HBoxContainer
+
+@onready var le = get_node(\"LineEdit\")
+@onready var btn = get_node(\"Button\")
+
+func _ready():
+	btn.connect(\"pressed\",Callable(self,\"btn_pressed\"))
+
+func btn_pressed():
+	self.queue_free()
+	pass
+"
+
+[node name="check_box_item" type="HBoxContainer"]
+offset_right = 597.0
+offset_bottom = 31.0
+script = SubResource("GDScript_6qy4y")
+
+[node name="LineEdit" type="LineEdit" parent="."]
+layout_mode = 2
+offset_right = 553.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+placeholder_text = "选项标题"
+
+[node name="Button" type="Button" parent="."]
+layout_mode = 2
+offset_left = 557.0
+offset_right = 597.0
+offset_bottom = 31.0
+text = "删除"

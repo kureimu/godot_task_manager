@@ -1,0 +1,331 @@
+[gd_scene load_steps=9 format=3 uid="uid://4r6dikf6o2q8"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7qc86"]
+bg_color = Color(0.301961, 0.301961, 0.301961, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="GDScript" id="GDScript_gokpn"]
+resource_name = "root"
+script/source = "extends VBoxContainer
+
+@onready var LE1 = get_node(\"LineEdit\")
+@onready var LE2 = get_node(\"LineEdit2\")
+@onready var btn = get_node(\"Button\")
+@onready var cb1 = get_node(\"%CheckBox\")
+@onready var cb2 = get_node(\"%CheckBox2\")
+
+func _ready():
+	btn.connect(\"pressed\",Callable(self,\"btnPressed\"))
+
+func btnPressed():
+	var err : int
+	if cb1.button_pressed == true:
+		err = account.reg_account(LE1.get_text(),LE2.get_text(),0)
+		pass
+	elif cb2.button_pressed == true:
+		err = account.reg_account(LE1.get_text(),LE2.get_text(),1)
+		pass
+	else:
+		printerr(\"没有选择level！\")
+	if err == 0:
+		print(\"注册完成\")
+	else:
+		print(\"注册失败，错误码：\",err)
+	pass
+"
+
+[sub_resource type="ButtonGroup" id="ButtonGroup_qqha4"]
+
+[sub_resource type="GDScript" id="GDScript_5mo85"]
+resource_name = "btn"
+script/source = "extends Button
+
+
+func _pressed():
+	print(\"clear all account\",account.accountFile.clear())
+	account.save_config_file()
+"
+
+[sub_resource type="GDScript" id="GDScript_m45c4"]
+resource_name = "btn2"
+script/source = "extends Button
+
+
+func _pressed():
+	print(programs.get_programs_list())
+	print(programs.programsFile)
+	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_a42td"]
+resource_name = "clean_all_program"
+script/source = "extends Button
+
+func _pressed():
+	programs.programsFile.clear()
+	print(\"清空项目!\")
+	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_5vlpc"]
+resource_name = "root"
+script/source = "extends VBoxContainer
+
+@onready var le = get_node(\"LineEdit\")
+@onready var btn = get_node(\"Button\")
+
+func _ready():
+	btn.connect(\"pressed\",Callable(self,\"btn_pressed\"))
+
+func btn_pressed():
+	var err = programs.set_programs_property(le.text,\"creator\",\"admin\")
+	if err == 0:
+		print(\"添加成功!\")
+	else:
+		printerr(\"添加失败！\")
+	pass
+"
+
+[sub_resource type="GDScript" id="GDScript_85g63"]
+resource_name = "root"
+script/source = "extends VBoxContainer
+
+@onready var btn = get_node(\"Button\")
+@onready var le = get_node(\"LineEdit\")
+
+func _ready():
+	btn.connect(\"pressed\",Callable(self,\"_btn_pressed\"))
+
+func _btn_pressed():
+	programs.write_programs_metadata2csv_file(le.get_text())
+	print(\"保存csv文件！\")
+	pass
+"
+
+[node name="Node" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+metadata/_edit_lock_ = true
+
+[node name="TabContainer" type="TabContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="DebugPage1" type="PanelContainer" parent="TabContainer"]
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7qc86")
+
+[node name="Control" type="Control" parent="TabContainer/DebugPage1"]
+layout_mode = 2
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1151.0
+offset_bottom = 616.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/DebugPage1/Control"]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 24.0
+offset_right = 387.0
+offset_bottom = 140.0
+script = SubResource("GDScript_gokpn")
+
+[node name="LineEdit" type="LineEdit" parent="TabContainer/DebugPage1/Control/VBoxContainer"]
+layout_mode = 2
+offset_right = 350.0
+offset_bottom = 31.0
+placeholder_text = "注册的账号"
+max_length = 20
+
+[node name="LineEdit2" type="LineEdit" parent="TabContainer/DebugPage1/Control/VBoxContainer"]
+layout_mode = 2
+offset_top = 35.0
+offset_right = 350.0
+offset_bottom = 66.0
+placeholder_text = "注册的密码"
+max_length = 20
+secret = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TabContainer/DebugPage1/Control/VBoxContainer"]
+layout_mode = 2
+offset_top = 70.0
+offset_right = 350.0
+offset_bottom = 101.0
+
+[node name="CheckBox" type="CheckButton" parent="TabContainer/DebugPage1/Control/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_right = 173.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+button_pressed = true
+button_group = SubResource("ButtonGroup_qqha4")
+text = "operator"
+
+[node name="CheckBox2" type="CheckButton" parent="TabContainer/DebugPage1/Control/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 177.0
+offset_right = 350.0
+offset_bottom = 31.0
+size_flags_horizontal = 3
+button_group = SubResource("ButtonGroup_qqha4")
+text = "manager"
+
+[node name="Button" type="Button" parent="TabContainer/DebugPage1/Control/VBoxContainer"]
+layout_mode = 2
+offset_top = 105.0
+offset_right = 350.0
+offset_bottom = 136.0
+text = "注册"
+
+[node name="DebugPage2" type="PanelContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7qc86")
+
+[node name="Control" type="Control" parent="TabContainer/DebugPage2"]
+layout_mode = 2
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1151.0
+offset_bottom = 616.0
+
+[node name="Button" type="Button" parent="TabContainer/DebugPage2/Control"]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 27.0
+offset_right = 213.0
+offset_bottom = 83.0
+text = "clear all account"
+script = SubResource("GDScript_5mo85")
+
+[node name="Button2" type="Button" parent="TabContainer/DebugPage2/Control"]
+layout_mode = 1
+offset_left = 267.0
+offset_top = 27.0
+offset_right = 442.0
+offset_bottom = 83.0
+text = "programs_list"
+script = SubResource("GDScript_m45c4")
+
+[node name="Button3" type="Button" parent="TabContainer/DebugPage2/Control"]
+layout_mode = 1
+offset_left = 506.0
+offset_top = 27.0
+offset_right = 681.0
+offset_bottom = 83.0
+text = "clean all program"
+script = SubResource("GDScript_a42td")
+
+[node name="DebugPage3" type="PanelContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7qc86")
+
+[node name="Control" type="Control" parent="TabContainer/DebugPage3"]
+layout_mode = 2
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1151.0
+offset_bottom = 616.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/DebugPage3/Control"]
+layout_mode = 0
+offset_left = 38.0
+offset_top = 39.0
+offset_right = 335.0
+offset_bottom = 206.0
+script = SubResource("GDScript_5vlpc")
+
+[node name="LineEdit" type="LineEdit" parent="TabContainer/DebugPage3/Control/VBoxContainer"]
+layout_mode = 2
+offset_right = 297.0
+offset_bottom = 31.0
+placeholder_text = "program名称"
+max_length = 20
+
+[node name="Button" type="Button" parent="TabContainer/DebugPage3/Control/VBoxContainer"]
+layout_mode = 2
+offset_top = 35.0
+offset_right = 297.0
+offset_bottom = 66.0
+text = "添加program"
+
+[node name="DebugPage4" type="PanelContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7qc86")
+
+[node name="Control" type="Control" parent="TabContainer/DebugPage4"]
+layout_mode = 2
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1151.0
+offset_bottom = 616.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="TabContainer/DebugPage4/Control"]
+layout_mode = 1
+offset_left = 38.0
+offset_top = 39.0
+offset_right = 335.0
+offset_bottom = 206.0
+script = SubResource("GDScript_85g63")
+
+[node name="LineEdit" type="LineEdit" parent="TabContainer/DebugPage4/Control/VBoxContainer"]
+layout_mode = 2
+offset_right = 297.0
+offset_bottom = 31.0
+placeholder_text = "导出的项目名"
+max_length = 20
+
+[node name="Button" type="Button" parent="TabContainer/DebugPage4/Control/VBoxContainer"]
+layout_mode = 2
+offset_top = 35.0
+offset_right = 297.0
+offset_bottom = 66.0
+text = "导出项目的所有数据到CSV表格"

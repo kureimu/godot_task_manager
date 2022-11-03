@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="StyleBox" uid="uid://boqtvimh0my0e" path="res://res/scene/block_editor_mode/checkBtnBlock.tres" id="1_jgl6w"]
+
+[node name="CheckBox" type="CheckBox"]
+offset_right = 597.0
+offset_bottom = 23.0
+theme_override_styles/normal = ExtResource("1_jgl6w")
+theme_override_styles/pressed = ExtResource("1_jgl6w")
+theme_override_styles/disabled = ExtResource("1_jgl6w")
+theme_override_styles/hover = ExtResource("1_jgl6w")
+theme_override_styles/hover_pressed = ExtResource("1_jgl6w")
+theme_override_styles/focus = ExtResource("1_jgl6w")
+text = "选项1"

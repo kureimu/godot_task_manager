@@ -1,0 +1,111 @@
+[gd_scene load_steps=6 format=3 uid="uid://cxbembpd21k75"]
+
+[ext_resource type="StyleBox" uid="uid://boqtvimh0my0e" path="res://res/scene/block_editor_mode/checkBtnBlock.tres" id="1_gob4a"]
+
+[sub_resource type="GDScript" id="GDScript_wd5tl"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+@onready var rtl = get_node(\"%RichTextLabel\")
+@onready var checkButton = get_node(\"%CheckButton\")
+@onready var titleBar = get_node(\"%titleBar\")
+var checkButtonState = false
+
+func _ready():
+	checkButton.connect(\"toggled\",Callable(self,\"toggled\"))
+
+func toggled(button_pressed:bool):
+	checkButtonState = button_pressed
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.262745, 0.913725, 0.482353, 1, 0.219608, 0.976471, 0.843137, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jwsqt"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.580392, 0.580392, 0.580392, 1)
+
+[node name="cheakBtnBlock" type="MarginContainer"]
+offset_right = 741.0
+offset_bottom = 407.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_wd5tl")
+metadata/_edit_lock_ = true
+metadata/type = 2
+
+[node name="stringBlock" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2i(0, 250)
+layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 397.0
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="stringBlock"]
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 387.0
+
+[node name="titleBar" type="Label" parent="stringBlock/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 30)
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 30.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_jwsqt")
+text = "开关模块(check button block)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="stringBlock/VBoxContainer"]
+layout_mode = 2
+offset_top = 34.0
+offset_right = 641.0
+offset_bottom = 387.0
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="stringBlock/VBoxContainer/MarginContainer"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 631.0
+offset_bottom = 343.0
+
+[node name="RichTextLabel" type="RichTextLabel" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 50)
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 306.0
+size_flags_vertical = 3
+text = "待替换标题"
+
+[node name="CheckButton" type="CheckButton" parent="stringBlock/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 310.0
+offset_right = 621.0
+offset_bottom = 333.0
+theme_override_styles/normal = ExtResource("1_gob4a")
+theme_override_styles/pressed = ExtResource("1_gob4a")
+theme_override_styles/disabled = ExtResource("1_gob4a")
+theme_override_styles/hover = ExtResource("1_gob4a")
+theme_override_styles/hover_pressed = ExtResource("1_gob4a")
+theme_override_styles/focus = ExtResource("1_gob4a")
+text = "是/否"

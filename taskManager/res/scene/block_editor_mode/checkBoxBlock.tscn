@@ -1,0 +1,182 @@
+[gd_scene load_steps=6 format=3 uid="uid://0fds7w2ercmn"]
+
+[ext_resource type="PackedScene" uid="uid://cqykwkk4201y" path="res://res/scene/block_editor_mode/check_box_item.tscn" id="1_7fl4p"]
+
+[sub_resource type="GDScript" id="GDScript_31ida"]
+resource_name = "root"
+script/source = "extends MarginContainer
+
+@onready var add_btn = get_node(\"%add_btn\")
+@onready var le = get_node(\"%LineEdit\")
+@onready var del = get_node(\"%del\")
+@onready var list = get_node(\"%List\")
+
+func _ready():
+	del.connect(\"pressed\",Callable(self,\"del_pressed\"))
+	add_btn.connect(\"pressed\",Callable(self,\"add_btn_pressed\"))
+
+func del_pressed():
+	self.queue_free()
+	pass
+
+func add_btn_pressed():
+	var add_btn = preload(\"res://res/scene/block_editor_mode/check_box_item.tscn\")
+	add_btn = add_btn.instantiate()
+	list.add_child(add_btn)
+
+func getArr() -> Array:
+	var output : Array
+	for item in list.get_children():
+		output.append(item.get_child(0).text)
+	return output
+
+func setArr(input : Array):
+	for i in list.get_children():
+		i.queue_free()
+	for item in input:
+		var instan = load(\"res://res/scene/block_editor_mode/check_box_item.tscn\").instantiate()
+		list.add_child(instan)
+		instan.get_child(0).text = item
+		pass
+	pass
+"
+
+[sub_resource type="Gradient" id="Gradient_q6fev"]
+offsets = PackedFloat32Array(0.0695364, 0.97351)
+colors = PackedColorArray(0.415686, 0.0666667, 0.796078, 1, 0.145098, 0.458824, 0.988235, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ib5jp"]
+gradient = SubResource("Gradient_q6fev")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_ol5al"]
+texture = SubResource("GradientTexture2D_ib5jp")
+region_rect = Rect2(0, 0, 64, 64)
+modulate_color = Color(0.803922, 0.803922, 0.803922, 1)
+
+[node name="cheakBoxBlock" type="MarginContainer"]
+offset_right = 741.0
+offset_bottom = 300.0
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 10
+script = SubResource("GDScript_31ida")
+metadata/_edit_lock_ = true
+metadata/type = 3
+
+[node name="panelContainer" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2i(0, 350)
+layout_mode = 2
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 691.0
+offset_bottom = 360.0
+metadata/_edit_lock_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer"]
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 350.0
+
+[node name="Label" type="Label" parent="panelContainer/VBoxContainer"]
+custom_minimum_size = Vector2i(0, 30)
+layout_mode = 2
+offset_right = 641.0
+offset_bottom = 30.0
+theme_override_colors/font_shadow_color = Color(0.396078, 0.396078, 0.396078, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_styles/normal = SubResource("StyleBoxTexture_ol5al")
+text = "单选模块(check box block)"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="panelContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 34.0
+offset_right = 641.0
+offset_bottom = 350.0
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 631.0
+offset_bottom = 306.0
+
+[node name="LineEdit" type="TextEdit" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2i(0, 100)
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 100.0
+placeholder_text = "填写标题文字"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 104.0
+offset_right = 621.0
+offset_bottom = 261.0
+size_flags_vertical = 3
+
+[node name="MarginContainer" type="MarginContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+offset_right = 621.0
+offset_bottom = 157.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="VBoxContainer" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer"]
+layout_mode = 2
+offset_left = 12.0
+offset_right = 609.0
+offset_bottom = 157.0
+
+[node name="Label" type="Label" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_right = 597.0
+offset_bottom = 26.0
+text = "选项："
+
+[node name="List" type="VBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 30.0
+offset_right = 597.0
+offset_bottom = 122.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="check_box_item" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer/List" instance=ExtResource("1_7fl4p")]
+layout_mode = 2
+
+[node name="add_btn" type="Button" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/ScrollContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_top = 126.0
+offset_right = 597.0
+offset_bottom = 157.0
+text = "添加选项"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+offset_top = 265.0
+offset_right = 621.0
+offset_bottom = 296.0
+alignment = 2
+
+[node name="del" type="Button" parent="panelContainer/VBoxContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 581.0
+offset_right = 621.0
+offset_bottom = 31.0
+text = "删除"

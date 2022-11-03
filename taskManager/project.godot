@@ -1,0 +1,51 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+_global_script_classes=[{
+"base": "Node",
+"class": &"csvTool",
+"language": &"GDScript",
+"path": "res://class/csvTool.gd"
+}, {
+"base": "Node",
+"class": &"stringTool",
+"language": &"GDScript",
+"path": "res://class/stringTool.gd"
+}]
+_global_script_class_icons={
+"csvTool": "",
+"stringTool": ""
+}
+
+[application]
+
+config/name="taskManager"
+run/main_scene="res://res/scene/main.tscn"
+config/features=PackedStringArray("4.0", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+network="*res://class/network/network.gd"
+csvManager="*res://class/csvManager.gd"
+loading="*res://res/scene/loading.tscn"
+account="*res://class/account.gd"
+programs="*res://class/programs.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom_font="res://font/hui_pu/AlibabaPuHuiTi-2-55-Regular.otf"

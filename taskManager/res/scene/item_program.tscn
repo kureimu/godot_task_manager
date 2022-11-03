@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvtdi3xompb0s"]
+
+[sub_resource type="GDScript" id="GDScript_n2snv"]
+resource_name = "root"
+script/source = "extends HBoxContainer
+
+@onready var btn1 = get_node(\"Button\")
+@onready var btn2 = get_node(\"Button2\")
+"
+
+[node name="item_program" type="HBoxContainer"]
+custom_minimum_size = Vector2i(250, 0)
+offset_right = 404.0
+offset_bottom = 50.0
+script = SubResource("GDScript_n2snv")
+
+[node name="Button" type="Button" parent="."]
+custom_minimum_size = Vector2i(50, 50)
+layout_mode = 2
+offset_right = 350.0
+offset_bottom = 50.0
+size_flags_horizontal = 3
+toggle_mode = true
+text = "这里是记录的标题"
+
+[node name="Button2" type="Button" parent="."]
+custom_minimum_size = Vector2i(50, 50)
+layout_mode = 2
+offset_left = 354.0
+offset_right = 404.0
+offset_bottom = 50.0
+text = "删除"
